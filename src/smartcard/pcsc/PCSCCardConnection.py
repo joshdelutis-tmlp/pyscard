@@ -33,8 +33,9 @@ from smartcard.scard import *
 
 def translateprotocolmask(protocol):
     """Translate L{CardConnection} protocol mask into PCSC protocol mask."""
-    pcscprotocol = 0
+    pcscprotocol = -1
     if protocol is not None:
+        pcscprotocol = 0
         if CardConnection.T0_protocol & protocol:
             pcscprotocol |= SCARD_PROTOCOL_T0
         if CardConnection.T1_protocol & protocol:
@@ -43,6 +44,8 @@ def translateprotocolmask(protocol):
             pcscprotocol |= SCARD_PROTOCOL_RAW
         if CardConnection.T15_protocol & protocol:
             pcscprotocol |= SCARD_PROTOCOL_T15
+        if CardConnection.UNDEFINED_protocol & protocol:
+            pcscprotocol |= SCARD_PROTOCOL_UNDEFINED
     return pcscprotocol
 
 
@@ -64,6 +67,7 @@ dictProtocol = {
     SCARD_PROTOCOL_T0: "T0",
     SCARD_PROTOCOL_T1: "T1",
     SCARD_PROTOCOL_RAW: "RAW",
+    SCARD_PROTOCOL_UNDEFINED: "UNDEFINED",
     SCARD_PROTOCOL_T15: "T15",
     SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1: "T0 or T1",
 }
@@ -110,7 +114,7 @@ class PCSCCardConnection(CardConnection):
         C{smartcard.scard.SCARD_SHARE_SHARED}."""
         CardConnection.connect(self, protocol)
         pcscprotocol = translateprotocolmask(protocol)
-        if 0 == pcscprotocol:
+        if -1 == pcscprotocol:
             pcscprotocol = self.getProtocol()
 
         if mode is None:
@@ -165,7 +169,7 @@ class PCSCCardConnection(CardConnection):
             raise CardConnectionException("Card not connected")
 
         pcscprotocol = translateprotocolmask(protocol)
-        if 0 == pcscprotocol:
+        if -1 == pcscprotocol:
             pcscprotocol = self.getProtocol()
 
         if mode is None:
