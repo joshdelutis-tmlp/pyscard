@@ -42,6 +42,9 @@ class CardConnection(Observable):
     T15_protocol = 0x00000008
     """ protocol T=15 """
 
+    UNDEFINED_protocol = 0x00000000
+    """ protocol UNDEFINED """
+
     def __init__(self, reader):
         """Construct a new card connection.
 
